@@ -133,9 +133,10 @@ from flask import json
 
 def test_find_user(client):
     response = client.get('/user/bob')
+    response_json = json.loads(response.data.decode('utf8'))
 
     assert response.status_code == 200
-    assert response.data['lname'] == "Newby"
+    assert response_json['lname'] == "Newby"
 
 ```
 
