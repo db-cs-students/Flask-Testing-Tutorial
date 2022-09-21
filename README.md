@@ -60,7 +60,7 @@ pip install -e .
 
 This command searches for the setup.py we created, and installs the application in our virtual environment. The `-e` allows us to make changes to the app without having to reinstall it every time.
 
-Now that we have all the packages installed, we need to create the setup for the tests. Create a directory named `tests`. Inside it create a new file named `testconf.py`. Inside that file we'll put the following.
+Now that we have all the packages installed, we need to create the setup for the tests. Create a directory named `tests`. Inside it create a new file named `conftest.py`. Inside that file we'll put the following.
 
 ```python
 import os
