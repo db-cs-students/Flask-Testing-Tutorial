@@ -9,9 +9,10 @@ users = [
     {"fname": "Jim", "lname": "Hopper"},
 ]
 
+
 def find_user(user):
     for line in users:
-        if user == line['fname']:
+        if user.lower() == line['fname'].lower():
             return line
     return None
 
@@ -36,6 +37,14 @@ def create_app(test_config=None):
     @app.route('/')
     def hello():
         return 'Hello, earth!'
-    
+
+    @app.route('/user/<username>')
+    def get_user(username):
+        result = find_user(username)
+
+        if result != None:
+            return jsonify(result)
+
+        return "No user found", 404
+
     return app
-    
