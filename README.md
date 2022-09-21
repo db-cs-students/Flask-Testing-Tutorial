@@ -11,6 +11,8 @@ Additionally, we will explore the idea of Test Driven Development. TDD is the pr
 
 ## Tutorial
 
+In order to follow along with the tutorial, you'll need to clone this respository and have Python 3 installed. The tutorial is written for Flask 2.2.x and Pytest 7.1.x. 
+
 ### Step 1 - Setup
 
 In the setup process, we will be creating virtual environment for our application, and then we will install the necessary modules. After everything is installed, we will configure the application to run the tests.
@@ -131,7 +133,7 @@ Now let's write a test that fails. Create a new file in the tests directory name
 ```python
 from flask import json
 
-def test_find_user(client):
+def test_get_user(client):
     response = client.get('/user/bob')
     response_json = json.loads(response.data.decode('utf8'))
 
@@ -143,9 +145,9 @@ def test_find_user(client):
 Running pytest should result in a failing test. That is because our app does not have a route for users. Let's create a route to handle this. Open the `__init__.py` in the `my_app` directory. Add a new route like below.
 
 ```python
-@app.route('/user/<user>')
-def get_user(user):
-    result = find_user(user)
+@app.route('/user/<username>')
+def get_user(username):
+    result = find_user(username)
 
     if result != None:
         return jsonify(results)
@@ -153,4 +155,103 @@ def get_user(user):
     return "No user found", 404
 ```
 
-Now you should be able to rerun `pytest` and see a passing test.
+Now you should be able to rerun `pytest` but you will still see a failing test. Upon examining the output, you may realize that we made a request for `/user/bob` but the list of users includes `Bob`. This should be easy to fix, but through test driven development we were able to catch it quickly. Let's only the `my_app/__init__.py` and modify our `find_user` function to make everything lower case. Find the line
+
+```python
+if user == line['fname']:
+```
+
+and change it to 
+
+```python
+if user.lower() == line['fname'].lower():
+```
+
+Great, let's go back to our test and add a few more tests to deal with other cases that might occur. When you are writing tests, it is important to think about edge cases. These are the situations where the users is at the 'edge' of possible inputs. For example, if you are dealing with a range of numbers 1-10 as possible outputs. Our test cases should include a number in the middle, the begining of the range (i.e. 1), the end of the range (i.e. 10), and numbers outside the range (i.e. 100). By writing tests for all these possiblilites we are more likely to catch errors in our application's logic. In the case of the app in the tutorial, uppercase and lowercase inputs would be an edge. Let's rewrite our first test to make it a bit more specific. Change the name of the test and add the assert statements at the bottom like below.
+
+```python
+def test_get_user_bob(client):
+    response = client.get('user/Bob')
+    response_json = json.loads(response.data.decode('utf8'))
+
+    assert response.status_code == 200
+    assert response_json['lname'] == "Newby"
+    assert not response_json['lname'] == "Hopper"
+```
+
+Now we can replicate this test with another user in our list. 
+
+```python
+def test_get_user_jim(client):
+    response = client.get('user/jim')
+    response_json = json.loads(response.data.decode('utf8'))
+
+    assert response.status_code == 200
+    assert response_json['lname'] == "Hopper"
+    assert not response_json['lname'] == "Newby"
+```
+
+We can also test for a user not in the list.
+
+```python
+def test_get_user_not_found(client):
+    response = client.get('user/not%20found')
+
+    assert response.status_code == 404
+    assert response.data == b"No user found"
+```
+
+Also since we might be repeating the conversion to json in most of our tests, we can extract that into a helper function. At the top of our test, add a new function.
+
+```python
+def response_json(response):
+    return json.loads(response.data.decode('utf8'))
+```
+
+Now we can refactor our previous tests to use this new function. For example, the first test would now look like this:
+
+```python
+def test_get_user_bob(client):
+    response = client.get('user/Bob')
+
+    assert response.status_code == 200
+    assert response_json(response)['lname'] == "Newby"
+```
+
+If you use it more than once within a test, it may be worth setting up a variable to store the new json data. For example, the second test would now look like this:
+
+```python
+def test_get_user_jim(client):
+    response = client.get('user/jim')
+    json = response_json(response)
+
+    assert response.status_code == 200
+    assert json['lname'] == "Hopper"
+    assert not json['lname'] == "Newby"
+```
+
+Try creating another test following this pattern that might test an edge case.
+
+### Step 4 - Writing Unit Tests
+
+Now that we looked at several examples of functional tests, let's look at an example of an unit test. We really on have one unit to test in our app right now and that is the `find_user` function. Here we can test this function sepearately from the functional application of it in the user route.
+
+Create a new file in your `tests` directory named `test_find_user.py`, and then lets write a simple test.
+
+```python
+from my_app import find_user
+
+
+def test_find_user():
+    assert find_user('bob')['lname'] == 'Newby'
+    assert find_user('JIM')['lname'] == 'Hopper'
+    assert find_user('DuStIn')['lname'] == 'Henderson'
+    assert find_user('mIKE')['lname'] == 'Wheeler'
+    assert find_user('Bailey') == None
+```
+
+Here we just have a single test, but multiple assertions are made to test various capitalization and users not in the list. These tests can be helpful when a bug is occuring in the functional tests. You can quickly eliminate a unit as being the culprit and move on to narrowing down the location of the bug. 
+
+## Conclusion
+
+You now have written several different types of tests that ensure that the code will not break as we add features and make changes to the data. While tests do not prevent us from making mistakes they do help us catch them earlier and help us idenify where the error has occured. Pytest has may more cool features and plugins that can enhance the output of the tests. Be sure to explore the documentation of pytest at https://docs.pytest.org/ and you can see plugins available at https://docs.pytest.org/en/7.0.x/reference/plugin_list.html.
