@@ -11,7 +11,7 @@ Additionally, we will explore the idea of Test Driven Development. TDD is the pr
 
 ## Tutorial
 
-In order to follow along with the tutorial, you'll need to clone this respository and have Python 3 installed. The tutorial is written for Flask 2.2.x and Pytest 7.1.x. 
+In order to follow along with the tutorial, you'll need to clone this respository and have Python 3 installed. The tutorial is written for Flask 2.2.x and Pytest 7.1.x.
 
 ### Step 1 - Setup
 
@@ -161,7 +161,7 @@ Now you should be able to rerun `pytest` but you will still see a failing test. 
 if user == line['fname']:
 ```
 
-and change it to 
+and change it to
 
 ```python
 if user.lower() == line['fname'].lower():
@@ -179,7 +179,7 @@ def test_get_user_bob(client):
     assert not response_json['lname'] == "Hopper"
 ```
 
-Now we can replicate this test with another user in our list. 
+Now we can duplicate this test with another user in our list.
 
 ```python
 def test_get_user_jim(client):
@@ -230,11 +230,11 @@ def test_get_user_jim(client):
     assert not json['lname'] == "Newby"
 ```
 
-Try creating another test following this pattern that might test an edge case.
+**Your Turn:** Try creating another test following this pattern that might test an edge case.
 
 ### Step 4 - Writing Unit Tests
 
-Now that we looked at several examples of functional tests, let's look at an example of an unit test. We really on have one unit to test in our app right now and that is the `find_user` function. Here we can test this function sepearately from the functional application of it in the user route.
+Now that we looked at several examples of functional tests, let's look at an example of an unit test. We really only have one unit to test in our app right now and that is the `find_user` function. Here we can test this function sepearately from the functional application of it in the user route.
 
 Create a new file in your `tests` directory named `test_find_user.py`, and then lets write a simple test.
 
@@ -250,8 +250,28 @@ def test_find_user():
     assert find_user('Bailey') == None
 ```
 
-Here we just have a single test, but multiple assertions are made to test various capitalization and users not in the list. These tests can be helpful when a bug is occuring in the functional tests. You can quickly eliminate a unit as being the culprit and move on to narrowing down the location of the bug. 
+Here we just have a single test, but multiple assertions are made to test various capitalization and users not in the list. These tests can be helpful when a bug is occuring in the functional tests. You can quickly eliminate a unit as being the culprit and move on to narrowing down the location of the bug.
+
+**Important** - Go ahead and commit your code up to this point with the commit message `Complete tutorial`. Push your code to the remote repository. This will indicate that you are finished and will be the part of this assignment I go in to grade.
+
+### Step 5 - Your Turn
+
+Start a new branch named `my_turn`. Since the tutorial has been completed on the main brach, and you have committed the compled code there, you now have a space to make mistakes and experiment. You will be adding a new test and then implementing a new feature to pass that test.
+
+The feature you will be implementing is to get a user's birthday. Start by creating a new file in the `tests` directory named `test_get_birthday.py`. Write a test that will request a resource that includes the user's birthday. Be sure you think carefully about the route and what some of the possible return data would look like (i.e. json or raw data).
+
+Additionally, you will write a unit test for the search function that will find the user's birthday. Create a new file in `tests` named `test_find_birthday`. You will import this from your app, and create a few assersions to test various edge cases.
+
+**Important** Commit the new test with the commit message `Write test first`. This will prove to me that you wrote the test before trying to implement the feature.
+
+Next jump into the app and modify the user data to include a new key/value pair that includes a birthday - bonus if you can find the actual birthdays for the characters. Then implement a new route to return the data and a new function for finding the data in the list.
+
+Run your tests and fix any errors or issues until the tests all pass.
+
+**Important** Commit the work code with the commit message `Implement feature with passing tests`. Then be sure you push your branch to your remote repository.
 
 ## Conclusion
 
 You now have written several different types of tests that ensure that the code will not break as we add features and make changes to the data. While tests do not prevent us from making mistakes they do help us catch them earlier and help us idenify where the error has occured. Pytest has may more cool features and plugins that can enhance the output of the tests. Be sure to explore the documentation of pytest at https://docs.pytest.org/ and you can see plugins available at https://docs.pytest.org/en/7.0.x/reference/plugin_list.html.
+
+Go to Canvas and provide a link to your remote repository. Then answer the prompts to finish up this tutorial.
